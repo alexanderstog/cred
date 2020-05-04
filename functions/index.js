@@ -16,101 +16,52 @@ admin.initializeApp(functions.config().firebase);
 let db = admin.firestore();
 
 
+exports.addContact = functions.https.onRequest(async (req, res) => {
+  
+  var ranNum = Math.floor(Math.random() * 1000000) + 1 ;
+  var newDoc = ranNum.toString();
+  
+  let setDoc = db.collection('contacts').doc(newDoc).set(req.body);
+});
 
 
-app.get('/:id', async (req, res) => {
 
-  let id = req.params.id;
-  let facts = await db.collection('facts').orderBy('created', 'desc').get()
-    	.then(snapshot => {
-        let factList = [];
 
-            snapshot.forEach(doc => {
-            factList.push({
-                created: doc.data().created,
-                id: doc.id,
-                fact: doc.data().fact,
-                external: doc.data().external,
-                random:Math.floor((Math.random()*1000000)+1)
-            })
-          });
-            factList.sort(function(a, b){
-              return a.random - b.random;
-            });
-            return factList; 
-        })
-        .catch(err => {
-        console.log("ERROR ERROR LOOK AT ME:" + err);
-        return [err];
-        });
 
-    let sharedFact = await db.collection('facts').doc(id).get()
-    .then(doc => {
-        let sharedFact = [];
-        if(doc.exists)
-        sharedFact.push({
-            created: doc.data().created,
-                id: doc.id,
-                fact: doc.data().fact,
-                external: doc.data().external,
-                random:1
-        });
-        return sharedFact
-        })
-        .catch(err => {
-        console.log("ERROR ERROR LOOK AT ME:" + err);
-        return [err];
+app.get('/checkout/:id', async (req, res) => {
+  if (req.params.id == 1){
+  res.render('checkout',{
+    description : "Purse Checkout",
+    title: "Purse Checkout",
+    product: "So Basic!",
+    cost: "10",
+    options: ["£12 credit per month.","Early acces to sales","Monthly giveaways"]
+  });
+  } else if (req.params.id == 2) {
+    res.render('checkout',{
+      description : "Purse Checkout",
+      title: "Purse Checkout",
+      product: "The Fashionista",
+      cost: "30",
+      options: ["£45 credit per month.","Early access to sales and product launches.","Exclusive access to live events and store specials", "Weekly giveaways", "Discount codes for your friends"]
     });
 
-      res.render('shared-post',{
-        description : "risqué nonsense for everybody",
-        title: "braindump shared",
-        facts: facts,
-        sharedId: id,
-        sharedFact: sharedFact,
-      });
-      //res.send(challengeRequested);
+  }
+});
+
+app.get('/complete-account', async (req, res) => {
+  res.render('complete-account',{
+    description : "Sorry, there's been an error with your order",
+    title: "Purse",
+  });
 });
 
 app.get('/', async (req, res) => {
-  let facts = await db.collection('facts').orderBy('created', 'desc').get()
-    	.then(snapshot => {
-        let factList = [];
-
-        snapshot.forEach(doc => {
-          factList.push({
-            created: doc.data().created,
-            id: doc.id,
-            fact: doc.data().fact,
-            external: doc.data().external,
-            random:Math.floor((Math.random()*1000000)+1)
-          });
-          
-        });
-        factList.sort(function(a, b){
-          return a.random - b.random;
-        });
-
-        return factList; 
-             
-    })
-    .catch(err => {
-      console.log("ERROR ERROR LOOK AT ME:" + err);
-      return [err];
-     });
-
     res.render('index',{
-      description : "risqué nonsense for everybody",
-      title: "braindump",
-      facts: facts
+      description : "cred",
+      title: "cred",
     });
-    
-   //res.send(challenges);
 });
-
-
-
-
 
 
 exports.app = functions.https.onRequest(app);
